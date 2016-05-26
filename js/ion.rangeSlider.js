@@ -315,6 +315,9 @@
             decorate_both: true,
             values_separator: " — ",
 
+            min_label: false,
+            max_label: false,
+
             input_values_separator: ";",
 
             disable: false,
@@ -376,6 +379,9 @@
             values_separator: $inp.data("valuesSeparator"),
 
             input_values_separator: $inp.data("inputValuesSeparator"),
+
+            max_label: $inp.data("maxLabel"),
+            min_label: $inp.data("minLabel"),
 
             disable: $inp.data("disable")
         };
@@ -888,11 +894,11 @@
             }
 
             if (this.options.values.length) {
-                this.$cache.min.html(this.decorate(this.options.p_values[this.options.min]));
-                this.$cache.max.html(this.decorate(this.options.p_values[this.options.max]));
+                this.$cache.min.html(this.decorateMinMax(this.options.p_values[this.options.min], undefined, true));
+                this.$cache.max.html(this.decorateMinMax(this.options.p_values[this.options.max], undefined, false));
             } else {
-                this.$cache.min.html(this.decorate(this._prettify(this.options.min), this.options.min));
-                this.$cache.max.html(this.decorate(this._prettify(this.options.max), this.options.max));
+                this.$cache.min.html(this.decorateMinMax(this._prettify(this.options.min), this.options.min, true));
+                this.$cache.max.html(this.decorateMinMax(this._prettify(this.options.max), this.options.max, false));
             }
 
             this.labels.w_min = this.$cache.min.outerWidth(false);
@@ -2000,6 +2006,51 @@
                     if (o.postfix) {
                         decorated += " ";
                     }
+                }
+            }
+
+            if (o.postfix) {
+                decorated += o.postfix;
+            }
+
+            return decorated;
+        },
+
+        decorateMinMax: function (num, original, isMin) {
+            var decorated = "",
+              o = this.options;
+
+            if (o.prefix) {
+                decorated += o.prefix;
+            }
+
+            decorated += num;
+
+            if (o.max_postfix) {
+                if (o.values.length && num === o.p_values[o.max]) {
+                    decorated += o.max_postfix;
+                    if (o.postfix) {
+                        decorated += " ";
+                    }
+                } else if (original === o.max) {
+                    decorated += o.max_postfix;
+                    if (o.postfix) {
+                        decorated += " ";
+                    }
+                }
+            }
+
+            if(original === o.min || (o.values.length && num === o.p_values[o.min])){
+                if (typeof(o.min_label) == 'string' && isMin === true) {
+//                    console.log('o.min_label', o.min_label);
+                    decorated = o.min_label;
+                }
+            }
+
+            if(original === o.max || (o.values.length && num === o.p_values[o.max])){
+                if (typeof(o.max_label) == 'string' && isMin === false) {
+//                    console.log('o.max_label', o.max_label);
+                    decorated = o.max_label;
                 }
             }
 
